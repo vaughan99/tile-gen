@@ -19,8 +19,11 @@
             return a + ((b - a) * dist);
         }
 
-        const width = 5000;
-        const height = 5000;
+        const width = 6000;
+        const height = 6000;
+	const antiAliasX = 1;
+	const antiAliasY = 1;
+        const colorMapSize = 10;
 
         // AXIS NORMALIZATION
         // Decide on the type and periodicity of your axes. Interpolate values for each pixel index.
@@ -29,11 +32,11 @@
         const xAxis = [];
         const yAxis = [];
         const twoPi = 2 * Math.PI;
-        for (let it = 0; it < width; it++) {
-            xAxis[it] = linearInterpolate(0, twoPi, it / width);
+        for (let it = 0; it < (width * antiAliasX); it++) {
+            xAxis[it] = linearInterpolate(0, twoPi, it / (width * antiAliasX));
         }
-        for (let it = 0; it < height; it++) {
-            yAxis[it] = linearInterpolate(0, twoPi, it / height);
+        for (let it = 0; it < (height * antiAliasY); it++) {
+            yAxis[it] = linearInterpolate(0, twoPi, it / (height * antiAliasY));
         }
 
         // PATTERN CREATION
@@ -44,30 +47,28 @@
             //mode: 'cpu'
         });
         const patternKernel = gpu.createKernel(function(xAxis, yAxis) {
-            const x = xAxis[this.thread.x];
-            const y = yAxis[this.thread.y];
-            const twoPi = this.constants.twoPi
+	    const x = xAxis[this.thread.x];
+	    const y = yAxis[this.thread.y];
             let real = 0;
             let imag = 0;
 	    let newReal = 0;
 	    let newImag = 0;
             for (let it = 0; it < this.constants.iterations; it++) {
-                newReal = real*real - imag*imag + Math.cos(x);
+               	newReal = real*real - imag*imag + Math.cos(x);
 		newImag = 2*imag*real + Math.sin(y); 
 		real = newReal;
 		imag = newImag;
 		if (real > 10000000) {
-			return it;
+		    return it;
 		}
             }
-            return this.constants.iterations;
-
+	    return this.constants.iterations;
         }, {
             constants: {
-                iterations: 100,
-                twoPi: 2 * Math.PI
+                iterations: 100
             },
-            output: [width, height]
+	    graphical: false,
+            output: [width * antiAliasX, height * antiAliasY]
         });
         let timerStart = Date.now();
         const rawValues = patternKernel(xAxis, yAxis);
@@ -75,13 +76,11 @@
         console.log('pattern generation time elapsed: ' + (timerEnd - timerStart) + ' ms');
 
         // CREATING THE COLOR MAP
-        // Define your color map. This color map has 200 steps and goes from red -> blue.
         // Again, just using linear interpolation, this time between two color endpoints.
 	// In a UI, provide a widget to travel through various color waypoints.
-        const colorMapSize = 200;
         const colorMap = [];
-        const colorStart = [0.6, 0, 0]; // RGB 0->1
-        const colorEnd = [0, 0, 0.6];   // RGB 0->1
+        const colorStart = [0, 0, 0]; // RGB 0->1
+        const colorEnd = [1, 1, 1];   // RGB 0->1
         for (let it = 0; it < colorMapSize; it++) {
             const dist = it / colorMapSize;
             colorMap[it] = [
@@ -91,33 +90,47 @@
             ];
         }
 
-        // NORMALIZING THE RAW VALUES
+	// NORMALIZE AND RESOLVE ANTI-ALIASING
+	// Reduce the matrix by averaging extra pixels.
         // Find highest and lowest raw values.
         // We need these to normalize the domain of all raw values to our color map.
 	// If this could be done in a kernel, then we wouldn't have to take the
 	// results of the pattern function out of the GPU, which would save time.
         timerStart = Date.now();
-        let lowestRaw = Number.MAX_VALUE;
-        let highestRaw = Number.MIN_VALUE;
-        for (let xIdx = 0; xIdx < width; xIdx++) {
-            for (let yIdx = 0; yIdx < height; yIdx++) {
-                let rawVal = rawValues[xIdx][yIdx];
-                if (rawVal < lowestRaw) {
-                    lowestRaw = rawVal;
-                }
-                if (rawVal > highestRaw) {
-                    highestRaw = rawVal;
-                }
-            }
-        }
-        let colorScale = (highestRaw - lowestRaw) / colorMapSize;
+        let lowest = Number.MAX_VALUE;
+        let highest = Number.MIN_VALUE;
+	const aaSize = antiAliasX * antiAliasY;
+	const avgValues = [];
+	for (let yIdx = 0; yIdx < height; yIdx++) {
+	    avgValues[yIdx] = [];
+	    for (let xIdx = 0; xIdx < width; xIdx++) {
+		let sum = 0;
+	        for (let xAA = 0; xAA < antiAliasX; xAA++) {
+	    	    let x = xIdx * antiAliasX + xAA;
+		    for (let yAA = 0; yAA < antiAliasY; yAA++) {
+			let y = yIdx * antiAliasY + yAA; 
+			let raw = rawValues[y][x];
+			sum += raw;
+			if (raw < lowest) {
+		    	    lowest = raw;
+			}
+			if (raw > highest) {
+		       	    highest = raw;
+			}
+		    }
+		}
+		const avg = sum / aaSize;
+		avgValues[yIdx][xIdx] = avg;
+	    }
+	}
+        const colorScale = (highest - lowest) / colorMapSize;
         timerEnd = Date.now();
         console.log('color normalization time elapsed: ' + (timerEnd - timerStart) + ' ms');
 
         // MAPPING
-        const plotKernel = gpu.createKernel(function(rawValues, colorMap) {
-            const rawVal = rawValues[this.thread.x][this.thread.y];
-            const colorIdx = Math.floor((rawVal - this.constants.lowestRaw) / this.constants.colorScale);
+        const plotKernel = gpu.createKernel(function(avgValues, colorMap) {
+            const val = avgValues[this.thread.y][this.thread.x];
+            const colorIdx = Math.floor((val - this.constants.lowest) / this.constants.colorScale);
             this.color(
                 colorMap[colorIdx][0],
                 colorMap[colorIdx][1],
@@ -125,7 +138,7 @@
             );
         }, {
             constants: {
-                lowestRaw: lowestRaw,
+                lowest: lowest,
                 colorScale: colorScale
             },
             output: [width, height],
@@ -133,16 +146,15 @@
         });
 
         timerStart = Date.now();
-        plotKernel(rawValues, colorMap);
+        plotKernel(avgValues, colorMap);
         timerEnd = Date.now();
         console.log('plot time elapsed: ' + (timerEnd - timerStart) + ' ms');
         const canvas = plotKernel.canvas;
+	//canvas.width = width;
+	//canvas.height = height;
         document.getElementsByTagName('body')[0].appendChild(canvas);
 
-
-
         // Improvements
-        // - Anti-aliasing (calculating more points than are actually represented by pixels and averaging)
         // - Proivde other periodicity axis functions to enable geometric, escape (i.e. akin to Mandelbrot), and other fun pattern functions
         // - Tie together with a really nice UI
 

@@ -19,8 +19,8 @@
             return a + ((b - a) * dist);
         }
 
-        const width = 5000;
-        const height = 5000;
+        const width = 500;
+        const height = 500;
 
         // AXIS NORMALIZATION
         // Decide on the type and periodicity of your axes. Interpolate values for each pixel index.
@@ -47,24 +47,17 @@
             const x = xAxis[this.thread.x];
             const y = yAxis[this.thread.y];
             const twoPi = this.constants.twoPi
-            let real = 0;
-            let imag = 0;
-	    let newReal = 0;
-	    let newImag = 0;
+            let val1 = 0;
+            let val2 = 0;
             for (let it = 0; it < this.constants.iterations; it++) {
-                newReal = real*real - imag*imag + Math.cos(x);
-		newImag = 2*imag*real + Math.sin(y); 
-		real = newReal;
-		imag = newImag;
-		if (real > 10000000) {
-			return it;
-		}
+                val1 = Math.sin(x + val2 * twoPi) + Math.cos(y + val2 * twoPi);
+		val2 = Math.cos(x + val1 * twoPi) + Math.sin(y + val1 * twoPi); 
             }
-            return this.constants.iterations;
+            return val1*val2;
 
         }, {
             constants: {
-                iterations: 100,
+                iterations: 2,
                 twoPi: 2 * Math.PI
             },
             output: [width, height]
@@ -80,8 +73,8 @@
 	// In a UI, provide a widget to travel through various color waypoints.
         const colorMapSize = 200;
         const colorMap = [];
-        const colorStart = [0.6, 0, 0]; // RGB 0->1
-        const colorEnd = [0, 0, 0.6];   // RGB 0->1
+        const colorStart = [1, 0, 0]; // RGB 0->1
+        const colorEnd = [0, 0, 1];   // RGB 0->1
         for (let it = 0; it < colorMapSize; it++) {
             const dist = it / colorMapSize;
             colorMap[it] = [
