@@ -1,3 +1,13 @@
+# Up and Running
+Must have python installed for `npm install` to work. The following libraries also need to be installed:
+
+```
+sudo apt install make gcc g++-10 python-is-python3 libxt-dev libxi-dev libgl-dev
+XCC=g++-10 npm install
+```
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
