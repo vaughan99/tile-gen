@@ -63,7 +63,7 @@ const App = () => {
     e: React.SyntheticEvent<Element, Event>,
     data: ResizeCallbackData
   ) => {
-    updateProfile("size", { height: data.size.height, width: data.size.width });
+    updateProfile("size", { height: Math.round(data.size.height), width: Math.round(data.size.width) });
   };
 
   // Use this to draw the tiles canvas when things change.
