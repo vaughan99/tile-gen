@@ -1,3 +1,5 @@
+// export interface PerformanceChartData
+
 export const createPerformanceChartData = (
   axis: number,
   pattern: number,

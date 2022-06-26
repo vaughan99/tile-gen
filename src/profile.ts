@@ -1,13 +1,13 @@
-export interface ColorMapWaypoint {
-  r: number; // 0 - 255
-  g: number; // 0 - 255
-  b: number; // 0 - 255
-  distance: number; // 0 -> 1
-}
+import { RGBColor } from 'react-color';
+
+export interface PaletteControlPoint {
+  offset: number; // 0 -> 1
+  rgbColor: RGBColor;
+};
 
 export interface ControlPoint {
+  offset: number; // 0 -> 1
   value: number;
-  distance: number; // 0 -> 1
 }
 
 export interface AxisInterpolation {
@@ -41,7 +41,7 @@ export interface Size {
 export interface TileProfile {
   name: string;
   size: Size;
-  colorMap: ColorMapWaypoint[];
+  colorMap: PaletteControlPoint[];
   xAxis: AxisInterpolation;
   yAxis: AxisInterpolation;
   pattern: Pattern;
@@ -56,21 +56,21 @@ export const defaultProfile: TileProfile = {
     width: 500,
   },
   colorMap: [
-    { r: 0, g: 0, b: 0, distance: 0 },
-    { r: 255, g: 255, b: 255, distance: 1 },
+    { offset: 0, rgbColor: {r: 0, g:0, b:0, a:1} },
+    { offset: 1, rgbColor: {r:255, g:255, b:255, a:1} },
   ],
   xAxis: {
     type: "linear",
     controlPoints: [
-      { distance: 0, value: 0 },
-      { distance: 1, value: 0 },
+      { offset: 0, value: 0 },
+      { offset: 1, value: 0 },
     ],
   },
   yAxis: {
     type: "linear",
     controlPoints: [
-      { distance: 0, value: 0 },
-      { distance: 1, value: 0 },
+      { offset: 0, value: 0 },
+      { offset: 1, value: 0 },
     ],
   },
   pattern: {

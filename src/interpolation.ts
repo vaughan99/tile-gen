@@ -7,9 +7,9 @@ const errorCheck = (length: number, controlPoints: Array<ControlPoint>) => {
   if (length < 0) throw new Error("length must be positive");
   if (controlPoints.length < 2)
     throw new Error("must be at least two control points");
-  if (controlPoints[0].distance !== 0)
+  if (controlPoints[0].offset !== 0)
     throw new Error("first control point distance must be 0");
-  if (controlPoints[controlPoints.length - 1].distance !== 1)
+  if (controlPoints[controlPoints.length - 1].offset !== 1)
     throw new Error("last control point distance must be 1");
 };
 
@@ -24,11 +24,11 @@ export const generateLinearArray = (
   let w2: ControlPoint = controlPointQueue.shift() as ControlPoint;
   for (let it = 0; it < length; it++) {
     const overallDist = it / length;
-    if (overallDist > w2.distance) {
+    if (overallDist > w2.offset) {
       w1 = w2;
       w2 = controlPointQueue.shift() as ControlPoint;
     }
-    const relDist = (overallDist - w1.distance) / (w2.distance - w1.distance);
+    const relDist = (overallDist - w1.offset) / (w2.offset - w1.offset);
     values[it] = linear(w1.value, w2.value, relDist);
   }
 
@@ -52,6 +52,6 @@ export const generateBezierArray = (
 
 export const generateTrigonometricArray = (length: number): Array<number> =>
   generateLinearArray(length, [
-    { distance: 0, value: 0 },
-    { distance: 1, value: 2 * Math.PI },
+    { offset: 0, value: 0 },
+    { offset: 1, value: 2 * Math.PI },
   ]);
