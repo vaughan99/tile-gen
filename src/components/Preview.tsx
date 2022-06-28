@@ -14,35 +14,34 @@ export const Preview = (props: PreviewProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if ((canvasRef.current !== null) && (imageBuilding.image !== undefined)) {
+    if (canvasRef.current !== null && imageBuilding.image !== undefined) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
       if (ctx !== null) {
         const { image } = imageBuilding;
         const effect = async () => {
           const bitmap = await createImageBitmap(image);
-          const scaleX = canvasWidth / bitmap.width;
-          const scaleY = canvasHeight / bitmap.height;
-          const scale = scaleX > scaleY ? scaleX : scaleY;
+          const scaleX = bitmap.width / canvasWidth;
+          const scaleY = bitmap.height / canvasHeight;
+          const scale = scaleX >= scaleY ? scaleX : scaleY;
           ctx.drawImage(
             bitmap,
             0,
             0,
-            image.width,
-            image.height,
+            bitmap.width,
+            bitmap.height,
             0,
             0,
-            image.width / scale,
-            image.height / scale,
+            Math.floor(bitmap.width / scale),
+            Math.floor(bitmap.height / scale)
           );
         };
         effect();
       }
-    };
+    }
   }, [imageBuilding, canvasRef]);
 
-  
-  return(
+  return (
     <Box
       display="flex"
       justifyContent="center"
@@ -54,16 +53,14 @@ export const Preview = (props: PreviewProps) => {
         alignItems: 'center',
       }}
     >
-      { imageBuilding.image
-        ? 
-          <canvas
-            ref={canvasRef}
-            width={canvasWidth}
-            height={canvasHeight}
-          />
-        :
-          <CircularProgress aria-busy sx={{ height: canvasHeight, width: canvasWidth}} />
-      }
+      {imageBuilding.image ? (
+        <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />
+      ) : (
+        <CircularProgress
+          aria-busy
+          sx={{ height: canvasHeight, width: canvasWidth }}
+        />
+      )}
     </Box>
   );
 };

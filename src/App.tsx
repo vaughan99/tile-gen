@@ -23,12 +23,10 @@ import StraightenIcon from '@mui/icons-material/Straighten';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import BorderAllIcon from '@mui/icons-material/BorderAll';
 import { Dialog } from '@mui/material';
-import pixels from 'image-pixels';
 import { defaultProfile, TileProfile } from './profile';
 import { Preview } from './components/Preview';
 import { TiledView } from './components/TiledView';
 import { ImageBuilding } from './imageBuilding';
-import testImage from './assets/test.png';
 
 // import { ColorMapPicker } from './components/ColorMapPicker';
 // import { TileProfile, defaultProfile, PaletteControlPoint } from './profile';
@@ -97,7 +95,6 @@ import testImage from './assets/test.png';
 //       }
 //     }
 //   }, [profile, tileCanvasRef, drawState]);
-
 
 //   // Use this to cause changes to Undo/Redo buttons
 //   // React.useEffect(() => {
@@ -237,37 +234,39 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    '& .MuiDrawer-paper': {
-      position: 'relative',
-      whiteSpace: 'nowrap',
-      width: drawerWidth,
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  '& .MuiDrawer-paper': {
+    position: 'relative',
+    whiteSpace: 'nowrap',
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    boxSizing: 'border-box',
+    ...(!open && {
+      overflowX: 'hidden',
       transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
+        duration: theme.transitions.duration.leavingScreen,
       }),
-      boxSizing: 'border-box',
-      ...(!open && {
-        overflowX: 'hidden',
-        transition: theme.transitions.create('width', {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.leavingScreen,
-        }),
-        width: theme.spacing(7),
-        [theme.breakpoints.up('sm')]: {
-          width: theme.spacing(9),
-        },
-      }),
-    },
-  }),
-);
+      width: theme.spacing(7),
+      [theme.breakpoints.up('sm')]: {
+        width: theme.spacing(9),
+      },
+    }),
+  },
+}));
 
 const mdTheme = createTheme();
 
 export const App = () => {
   const [profile, setProfile] = useState<TileProfile>(defaultProfile);
-  const [imageBuilding, setImageBuilding] = useState<ImageBuilding>({state: 'start'});
+  const [imageBuilding, setImageBuilding] = useState<ImageBuilding>({
+    state: 'start',
+  });
   const [open, setOpen] = React.useState(true);
   // const [undoHistory, setUndoHistory] = useState<Array<TileProfile>>([]);
   // const [redoHistory, setRedoHistory] = useState<Array<TileProfile>>([]);
@@ -275,20 +274,40 @@ export const App = () => {
 
   // Calculate an image when the profile changes.
   useEffect(() => {
-    setImageBuilding({state: 'axis'});
+    setImageBuilding({ state: 'axis' });
     setTimeout(() => {
-      setImageBuilding({state: 'pattern'});
+      setImageBuilding({ state: 'pattern' });
     }, 100);
     setTimeout(() => {
-      setImageBuilding({state: 'normalizing'});
+      setImageBuilding({ state: 'normalizing' });
     }, 500);
     setTimeout(() => {
-      setImageBuilding({state: 'colorizing'});
+      setImageBuilding({ state: 'colorizing' });
     }, 1000);
     setTimeout(async () => {
-      console.log(testImage);
-      const image = await pixels(testImage);
-      setImageBuilding({state: 'done', image });
+      const { size } = profile;
+      let radius = size.width <= size.height ? size.width / 2 : size.height / 2;
+      let imageData = new ImageData(size.width, size.height);
+      const { data } = imageData;
+      const [red, green, blue, alpha] = [255, 0, 0, 200];
+      for (let x = -radius; x < radius; x++) {
+        for (let y = -radius; y < radius; y++) {
+          let distance = Math.sqrt(x * x + y * y);
+          if (distance > radius) {
+            // skip all (x,y) coordinates that are outside of the circle
+            continue;
+          }
+          // Figure out the starting index of this pixel in the image data array.
+          let adjustedX = x + radius; // convert x from [-50, 50] to [0, 100] (the coordinates of the image data array)
+          let adjustedY = y + radius; // convert y from [-50, 50] to [0, 100] (the coordinates of the image data array)
+          let index = (adjustedX + adjustedY * size.width) * 4;
+          data[index] = red;
+          data[index + 1] = green;
+          data[index + 2] = blue;
+          data[index + 3] = alpha;
+        }
+      }
+      setImageBuilding({ state: 'done', image: imageData });
     }, 1500);
   }, [profile]);
 
@@ -301,7 +320,7 @@ export const App = () => {
 
   return (
     <ThemeProvider theme={mdTheme}>
-      <Dialog fullScreen open={showFullscreen} sx={{ overflow: 'hidden'}}>
+      <Dialog fullScreen open={showFullscreen} sx={{ overflow: 'hidden' }}>
         <TiledView
           onFullscreenExit={onFullscreenExit}
           profile={profile}
@@ -338,7 +357,6 @@ export const App = () => {
             >
               Tile Generator
             </Typography>
-
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -413,16 +431,15 @@ export const App = () => {
                     flexDirection: 'column',
                     height: 240,
                   }}
-                >
-                  
-                </Paper>
+                ></Paper>
               </Grid>
               <Grid item xs={12} md={4} lg={3}>
-                <Preview imageBuilding={imageBuilding}/>
+                <Preview imageBuilding={imageBuilding} />
               </Grid>
               <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                </Paper>
+                <Paper
+                  sx={{ p: 2, display: 'flex', flexDirection: 'column' }}
+                ></Paper>
               </Grid>
             </Grid>
           </Container>
