@@ -9,7 +9,7 @@
     "@mui/icons-material": "5.8.4",
     "@mui/material": "^5.8.5",
     "gpu.js": "^2.15.2",
-    "material-ui-color": "^1.2.0",
+    "image-pixels": "^2.2.2",
     "react": "^18.0.0",
     "react-color": "^2.19.3",
     "react-compound-slider": "^3.3.1",

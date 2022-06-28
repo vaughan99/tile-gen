@@ -1,2 +1,2 @@
 
-declare module 'react-linear-gradient-picker';
+declare module 'image-pixels';

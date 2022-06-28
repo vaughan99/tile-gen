@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -23,9 +23,12 @@ import StraightenIcon from '@mui/icons-material/Straighten';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import BorderAllIcon from '@mui/icons-material/BorderAll';
 import { Dialog } from '@mui/material';
+import pixels from 'image-pixels';
 import { defaultProfile, TileProfile } from './profile';
 import { Preview } from './components/Preview';
-import { PreviewFullsize } from './components/PreviewFullsize';
+import { TiledView } from './components/TiledView';
+import { ImageBuilding } from './imageBuilding';
+import testImage from './assets/test.png';
 
 // import { ColorMapPicker } from './components/ColorMapPicker';
 // import { TileProfile, defaultProfile, PaletteControlPoint } from './profile';
@@ -264,10 +267,30 @@ const mdTheme = createTheme();
 
 export const App = () => {
   const [profile, setProfile] = useState<TileProfile>(defaultProfile);
+  const [imageBuilding, setImageBuilding] = useState<ImageBuilding>({state: 'start'});
   const [open, setOpen] = React.useState(true);
   // const [undoHistory, setUndoHistory] = useState<Array<TileProfile>>([]);
   // const [redoHistory, setRedoHistory] = useState<Array<TileProfile>>([]);
   const [showFullscreen, setShowFullscreen] = useState<boolean>(false);
+
+  // Calculate an image when the profile changes.
+  useEffect(() => {
+    setImageBuilding({state: 'axis'});
+    setTimeout(() => {
+      setImageBuilding({state: 'pattern'});
+    }, 100);
+    setTimeout(() => {
+      setImageBuilding({state: 'normalizing'});
+    }, 500);
+    setTimeout(() => {
+      setImageBuilding({state: 'colorizing'});
+    }, 1000);
+    setTimeout(async () => {
+      console.log(testImage);
+      const image = await pixels(testImage);
+      setImageBuilding({state: 'done', image });
+    }, 1500);
+  }, [profile]);
 
   const onFullscreen = () => setShowFullscreen(true);
   const onFullscreenExit = () => setShowFullscreen(false);
@@ -279,7 +302,12 @@ export const App = () => {
   return (
     <ThemeProvider theme={mdTheme}>
       <Dialog fullScreen open={showFullscreen} sx={{ overflow: 'hidden'}}>
-        <PreviewFullsize onFullscreenExit={onFullscreenExit} profile={profile} setProfile={setProfile} />
+        <TiledView
+          onFullscreenExit={onFullscreenExit}
+          profile={profile}
+          setProfile={setProfile}
+          imageBuilding={imageBuilding}
+        />
       </Dialog>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
@@ -333,7 +361,7 @@ export const App = () => {
                 <ListItemIcon>
                   <BorderAllIcon />
                 </ListItemIcon>
-                <ListItemText primary="Preview" />
+                <ListItemText primary="Tiled View" />
               </ListItemButton>
               <ListItemButton>
                 <ListItemIcon>
@@ -390,7 +418,7 @@ export const App = () => {
                 </Paper>
               </Grid>
               <Grid item xs={12} md={4} lg={3}>
-                <Preview profile={profile}/>
+                <Preview imageBuilding={imageBuilding}/>
               </Grid>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
