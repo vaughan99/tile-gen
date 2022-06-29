@@ -5,29 +5,28 @@ import { Resizable } from 'react-resizable';
 import { PreviewProps } from './Preview';
 import { TileProfile } from '../profile';
 
-const debounceTime = 300;
-
 export interface TiledViewProps extends PreviewProps {
   profile: TileProfile;
   setProfile: (profile: TileProfile) => void;
   onFullscreenExit: () => void;
 }
 
+// TODO: Save settings in local storage.
 export const TiledView = (props: TiledViewProps) => {
   const { profile, setProfile, onFullscreenExit, imageBuilding } = props;
   const [lockAspectRatio, setLockAspectRatio] = useState<boolean>(true);
   const [showFootprint, setShowFootprint] = useState<boolean>(false);
   const [tileWidth, setTileWidth] = useState<number>(profile.size.width);
   const [tileHeight, setTileHeight] = useState<number>(profile.size.height);
-  const [redrawTimer, setRedrawTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+  // const [redrawTimer, setRedrawTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [snap, setSnap] = useState<boolean>(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const onFootprintResize = (_evt: any, { size }: any) => {
-    if (redrawTimer !== null) {
-      clearTimeout(redrawTimer);
-      setRedrawTimer(null);
-    }
+    // if (redrawTimer !== null) {
+    //   clearTimeout(redrawTimer);
+    //   setRedrawTimer(null);
+    // }
     if (snap) {
       size.width = Math.round(size.width / 5) * 5;
       size.height = Math.round(size.height / 5) * 5;
@@ -37,10 +36,13 @@ export const TiledView = (props: TiledViewProps) => {
     }
     setTileWidth(size.width);
     setTileHeight(size.height);
-    setRedrawTimer(setTimeout(() => {
-      setProfile({...profile, size});
-    }, debounceTime));
   }
+
+  const onFootprintResizeStop = (evt: any, { size }: any) => {
+    onFootprintResize(evt, { size });
+    setProfile({...profile, size});
+  };
+
 
   useEffect(() => {
     if ((canvasRef.current !== null) && (imageBuilding.image !== undefined)) {
@@ -125,6 +127,7 @@ export const TiledView = (props: TiledViewProps) => {
               minConstraints={[20, 20]}
               maxConstraints={[500, 500]}
               onResize={onFootprintResize}
+              onResizeStop={onFootprintResizeStop}
             >
               <div
                 hidden={!showFootprint}
@@ -132,7 +135,6 @@ export const TiledView = (props: TiledViewProps) => {
                   height: tileHeight,
                   width: tileWidth,
                   backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                  // verticalAlign: 'center',
                   zIndex: 2001,
                   position: 'absolute',
                 }}

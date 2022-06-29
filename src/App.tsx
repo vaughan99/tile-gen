@@ -27,6 +27,7 @@ import { defaultProfile, TileProfile } from './profile';
 import { Preview } from './components/Preview';
 import { TiledView } from './components/TiledView';
 import { ImageBuilding } from './imageBuilding';
+import { FormatColorReset } from '@mui/icons-material';
 
 // import { ColorMapPicker } from './components/ColorMapPicker';
 // import { TileProfile, defaultProfile, PaletteControlPoint } from './profile';
@@ -267,7 +268,7 @@ export const App = () => {
   const [imageBuilding, setImageBuilding] = useState<ImageBuilding>({
     state: 'start',
   });
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   // const [undoHistory, setUndoHistory] = useState<Array<TileProfile>>([]);
   // const [redoHistory, setRedoHistory] = useState<Array<TileProfile>>([]);
   const [showFullscreen, setShowFullscreen] = useState<boolean>(false);
