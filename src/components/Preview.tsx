@@ -18,6 +18,7 @@ export const Preview = (props: PreviewProps) => {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (ctx !== null) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         const { image } = imageBuilding;
         const effect = async () => {
           const bitmap = await createImageBitmap(image);

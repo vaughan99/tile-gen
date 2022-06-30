@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-import { AppBar, Box, CircularProgress, FormControlLabel, FormGroup, IconButton, Switch, Toolbar, Typography } from '@mui/material';
+import {
+  AppBar,
+  Box,
+  CircularProgress,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  Switch,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import { Resizable } from 'react-resizable';
 import { PreviewProps } from './Preview';
@@ -36,19 +46,19 @@ export const TiledView = (props: TiledViewProps) => {
     }
     setTileWidth(size.width);
     setTileHeight(size.height);
-  }
+  };
 
   const onFootprintResizeStop = (evt: any, { size }: any) => {
     onFootprintResize(evt, { size });
-    setProfile({...profile, size});
+    setProfile({ ...profile, size });
   };
 
-
   useEffect(() => {
-    if ((canvasRef.current !== null) && (imageBuilding.image !== undefined)) {
+    if (canvasRef.current !== null && imageBuilding.image !== undefined) {
       const canvas = canvasRef.current;
-      const ctx = canvasRef.current.getContext("2d");
+      const ctx = canvasRef.current.getContext('2d');
       if (ctx !== null) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         const { image } = imageBuilding;
         const effect = async () => {
           const bitmap = await createImageBitmap(image);
@@ -61,11 +71,11 @@ export const TiledView = (props: TiledViewProps) => {
         };
         effect();
       }
-    };
+    }
   }, [imageBuilding, canvasRef]);
 
-  return(
-    <div style={{ overflow: 'hidden'}}>
+  return (
+    <div style={{ overflow: 'hidden' }}>
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar>
           <IconButton
@@ -82,21 +92,36 @@ export const TiledView = (props: TiledViewProps) => {
 
           <FormGroup aria-label="position" row>
             <FormControlLabel
-              control={<Switch onChange={(_evt, checked) => setShowFootprint(checked)} color="secondary" />}
+              control={
+                <Switch
+                  onChange={(_evt, checked) => setShowFootprint(checked)}
+                  color="secondary"
+                />
+              }
               disabled={!imageBuilding.image}
               checked={showFootprint}
               label="Show Footprint"
               labelPlacement="end"
             />
             <FormControlLabel
-              control={<Switch onChange={(_evt, checked) => setLockAspectRatio(checked)} color="secondary" />}
+              control={
+                <Switch
+                  onChange={(_evt, checked) => setLockAspectRatio(checked)}
+                  color="secondary"
+                />
+              }
               disabled={!imageBuilding.image || !showFootprint}
               checked={lockAspectRatio}
               label="Lock Aspect Ratio"
               labelPlacement="end"
             />
             <FormControlLabel
-              control={<Switch onChange={(_evt, checked) => setSnap(checked)} color="secondary" />}
+              control={
+                <Switch
+                  onChange={(_evt, checked) => setSnap(checked)}
+                  color="secondary"
+                />
+              }
               disabled={!imageBuilding.image || !showFootprint}
               checked={snap}
               label="Snap to 5px"
@@ -105,16 +130,15 @@ export const TiledView = (props: TiledViewProps) => {
           </FormGroup>
         </Toolbar>
       </AppBar>
-      <Box
-        display="flex"
-        overflow="hidden"
-      >
-      {
-        imageBuilding.image
-        ?
+      <Box display="flex" overflow="hidden">
+        {imageBuilding.image ? (
           <>
             <canvas
-              style={{ backgroundColor: "#f0f0f0", position: "relative", zIndex: 2000 }}
+              style={{
+                backgroundColor: '#f0f0f0',
+                position: 'relative',
+                zIndex: 2000,
+              }}
               ref={canvasRef}
               width={2500}
               height={2500}
@@ -141,9 +165,9 @@ export const TiledView = (props: TiledViewProps) => {
               />
             </Resizable>
           </>
-        :
+        ) : (
           <CircularProgress aria-busy size={100} thickness={6} />
-      }
+        )}
       </Box>
     </div>
   );

@@ -30,6 +30,7 @@ const WrappedColorPicker: React.FC<WrapperPropTypes> = ({
       color={rgbToRgba(rest.color, rest.opacity)}
       onChange={(c) => {
         const { r, g, b, a } = c.rgb;
+        console.log(`a ${JSON.stringify(a)}`);
         onSelect && onSelect(`rgb(${r}, ${g}, ${b})`, a || 1);
       }}
     />

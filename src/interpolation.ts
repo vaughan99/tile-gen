@@ -1,16 +1,16 @@
-import { ControlPoint } from "./profile";
+import { ControlPoint, PaletteControlPoint } from './profile';
 
 export const linear = (a: number, b: number, dist: number) =>
   a + (b - a) * dist;
 
 const errorCheck = (length: number, controlPoints: Array<ControlPoint>) => {
-  if (length < 0) throw new Error("length must be positive");
+  if (length < 0) throw new Error('length must be positive');
   if (controlPoints.length < 2)
-    throw new Error("must be at least two control points");
+    throw new Error('must be at least two control points');
   if (controlPoints[0].offset !== 0)
-    throw new Error("first control point distance must be 0");
+    throw new Error('first control point distance must be 0');
   if (controlPoints[controlPoints.length - 1].offset !== 1)
-    throw new Error("last control point distance must be 1");
+    throw new Error('last control point distance must be 1');
 };
 
 export const generateLinearArray = (
@@ -40,14 +40,14 @@ export const generateCubicSplineArray = (
   controlPoints: Array<ControlPoint>
 ): Array<number> => {
   errorCheck(length, controlPoints);
-  throw new Error("unimplemented");
+  throw new Error('unimplemented');
 };
 
 export const generateBezierArray = (
   length: number,
   controlPoints: Array<ControlPoint>
 ): Array<number> => {
-  throw new Error("unimplemented");
+  throw new Error('unimplemented');
 };
 
 export const generateTrigonometricArray = (length: number): Array<number> =>
@@ -55,3 +55,53 @@ export const generateTrigonometricArray = (length: number): Array<number> =>
     { offset: 0, value: 0 },
     { offset: 1, value: 2 * Math.PI },
   ]);
+
+export const generateLinearColorArrays = (
+  length: number,
+  palette: PaletteControlPoint[]
+) => {
+  // Fill in missing PaletteControlPoint at beginning or end.
+  const resolvedPalette = [...palette];
+  const len = palette.length;
+  console.log(`palette[0]: ${JSON.stringify(palette[0])}`);
+  console.log(`palette[len-1]: ${JSON.stringify(palette[len - 1])}`);
+  if (palette[0].offset !== 0) {
+    resolvedPalette.unshift({ ...palette[0], offset: 0 });
+  }
+  if (palette[len - 1].offset !== 1) {
+    resolvedPalette.push({ ...palette[len - 1], offset: 1 });
+  }
+
+  // Fill the arrays for each color.
+  const rgbSplitter = /[(,\s)]+/;
+  const r = generateLinearArray(
+    length,
+    resolvedPalette.map((p) => ({
+      offset: p.offset,
+      value: parseInt(p.color.split(rgbSplitter)[1]),
+    }))
+  );
+  const g = generateLinearArray(
+    length,
+    resolvedPalette.map((p) => ({
+      offset: p.offset,
+      value: parseInt(p.color.split(rgbSplitter)[2]),
+    }))
+  );
+  const b = generateLinearArray(
+    length,
+    resolvedPalette.map((p) => ({
+      offset: p.offset,
+      value: parseInt(p.color.split(rgbSplitter)[3]),
+    }))
+  );
+  const a = generateLinearArray(
+    length,
+    resolvedPalette.map((p) => ({
+      offset: p.offset,
+      value: (p.opacity || 1) * 255,
+    }))
+  );
+
+  return { r, g, b, a };
+};

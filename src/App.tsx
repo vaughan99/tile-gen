@@ -28,188 +28,7 @@ import { Preview } from './components/Preview';
 import { TiledView } from './components/TiledView';
 import { ImageBuilding } from './imageBuilding';
 import { ColorMapPicker } from './components/ColorMapPicker';
-
-// import { ColorMapPicker } from './components/ColorMapPicker';
-// import { TileProfile, defaultProfile, PaletteControlPoint } from './profile';
-// import {
-//   TileDrawState,
-//   drawTilesEmpty,
-//   drawTiles,
-//   drawTilesWorking,
-// } from './draw';
-// import { createPerformanceChartData, performanceOptions } from './performance';
-
-// const DRAW_TIMEOUT = 2500;
-
-// const App = () => {
-//   const [profile, setProfile] = useState<TileProfile>(defaultProfile);
-//   const [drawState, setDrawState] = useState<TileDrawState>("empty");
-//   const [performance, setPerformance] = useState(
-//     createPerformanceChartData(0, 0, 0)
-//   );
-//   const [drawTimer, setDrawTimer] = useState<number>();
-
-//   const updateProfile = <T extends keyof TileProfile>(
-//     property: T,
-//     value: TileProfile[T]
-//   ): void => {
-//     setProfile({ ...profile, [property]: value });
-//     if (drawTimer) {
-//       clearTimeout(drawTimer);
-//     }
-//     setDrawState("working");
-//     setDrawTimer(
-//       setTimeout(() => {
-//         // generate the tile
-
-//         // afterwards, set done and draw the tile
-//         setTimeout(() => {
-//           setDrawState("done");
-//         }, DRAW_TIMEOUT);
-//       }, DRAW_TIMEOUT) as unknown as number
-//     );
-//   };
-
-//   const onFootprintResize = (
-//     e: React.SyntheticEvent<Element, Event>,
-//     data: ResizeCallbackData
-//   ) => {
-//     updateProfile("size", { height: Math.round(data.size.height), width: Math.round(data.size.width) });
-//   };
-
-//   const onPaletteChange = (palette: PaletteControlPoint[]) => {
-//     console.log(`App onPaletteChange ${JSON.stringify(palette)}`);
-//     setProfile({ ...profile, colorMap: palette});
-//   };
-
-//   // Use this to draw the tiles canvas when things change.
-//   React.useEffect(() => {
-//     if (tileCanvasRef.current) {
-//       if (drawState === "empty") {
-//         drawTilesEmpty(tileCanvasRef.current, profile);
-//       } else if (drawState === "working") {
-//         setPerformance(createPerformanceChartData(0, 0, 0));
-//         drawTilesWorking(tileCanvasRef.current, profile);
-//       } else if (drawState === "done") {
-//         setPerformance(createPerformanceChartData(1, 45, 10));
-//         drawTiles(tileCanvasRef.current, profile);
-//       }
-//     }
-//   }, [profile, tileCanvasRef, drawState]);
-
-//   // Use this to cause changes to Undo/Redo buttons
-//   // React.useEffect(() => {
-//   // }, [undoHistory, redoHistory]);
-
-//   return (
-//     <div className="App" style={{ height: "100%", width: "100%" }}>
-//       <div
-//         className="flex flex-column"
-//         style={{ height: "100%", width: "100%" }}
-//       >
-//         <div className="flex-row">
-//           <Toolbar className="flex-grow-1" />
-//         </div>
-//         <div className="flex flex-grow-1 flex-row">
-//           <Splitter className="flex-grow-1">
-//             <SplitterPanel>
-//               <TabView>
-//                 <TabPanel header="Color Map">
-//                   <div style={{ height: 300, width: "100%"}}>
-//                     <ColorMapPicker palette={profile.colorMap} onPaletteChange={onPaletteChange}/>
-//                   </div>
-//                 </TabPanel>
-//                 <TabPanel header="Axis">Axis Metadata</TabPanel>
-//                 <TabPanel header="Pattern">Pattern Text</TabPanel>
-//                 <TabPanel header="Normalization">
-//                   Normalization Metadata
-//                 </TabPanel>
-//               </TabView>
-//             </SplitterPanel>
-//             <SplitterPanel className="flex flex-column">
-//               <div
-//                 style={{ position: "relative" }}
-//                 className="flex-grow-1"
-//                 ref={canvasParentRef}
-//               >
-//                 <canvas
-//                   ref={tileCanvasRef}
-//                   className="absolute top-0 left-0 z-0"
-//                   width={0}
-//                   height={0}
-//                 />
-//                 <Resizable
-//                   height={profile.size.height}
-//                   width={profile.size.width}
-//                   lockAspectRatio={lockAspectRatio}
-//                   className="absolute top-0 left-0 z-1"
-//                   handleSize={[10, 10]}
-//                   minConstraints={[20, 20]}
-//                   maxConstraints={[800, 800]}
-//                   onResize={onFootprintResize}
-//                 >
-//                   <div
-//                     hidden={!showFootprint}
-//                     style={{
-//                       height: profile.size.height,
-//                       width: profile.size.width,
-//                       backgroundColor: "rgba(127, 127, 127, 0.2)",
-//                       verticalAlign: "center",
-//                     }}
-//                   >
-//                     {profile.size.width} x {profile.size.height}
-//                   </div>
-//                 </Resizable>
-//               </div>
-//               <div style={{ height: "45px" }}>
-//                 <ToggleButton
-//                   style={{
-//                     height: "25px",
-//                     width: "225px",
-//                     margin: "10px",
-//                     padding: "10px",
-//                   }}
-//                   checked={showFootprint}
-//                   onIcon="pi pi-th-large"
-//                   onLabel={`Footprint (${profile.size.width} x ${profile.size.height})`}
-//                   offIcon="pi pi-table"
-//                   offLabel={`Footprint (${profile.size.width} x ${profile.size.height})`}
-//                   onChange={(e) => setShowFootprint(e.value)}
-//                 />
-//                 <ToggleButton
-//                   style={{
-//                     height: "25px",
-//                     width: "150px",
-//                     margin: "10px",
-//                     padding: "10px",
-//                   }}
-//                   disabled={!showFootprint}
-//                   checked={lockAspectRatio}
-//                   onIcon="pi pi-lock"
-//                   onLabel="Aspect Ratio"
-//                   offLabel="Aspect Ratio"
-//                   offIcon="pi pi-lock-open"
-//                   onChange={(e) => setLockAspectRatio(e.value)}
-//                 />
-//               </div>
-//             </SplitterPanel>
-//           </Splitter>
-//         </div>
-//         <div className="flex flex-none flex-row">
-//           <Chart
-//             className="flex-grow-1"
-//             type="bar"
-//             style={{ height: "80px" }}
-//             data={performance}
-//             options={performanceOptions}
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default App;
+import { generateLinearColorArrays } from './interpolation';
 
 const drawerWidth: number = 240;
 
@@ -275,41 +94,29 @@ export const App = () => {
 
   // Calculate an image when the profile changes.
   useEffect(() => {
-    setImageBuilding({ state: 'axis' });
-    setTimeout(() => {
-      setImageBuilding({ state: 'pattern' });
-    }, 100);
-    setTimeout(() => {
-      setImageBuilding({ state: 'normalizing' });
-    }, 500);
-    setTimeout(() => {
-      setImageBuilding({ state: 'colorizing' });
-    }, 1000);
-    setTimeout(async () => {
-      const { size } = profile;
-      let radius = size.width <= size.height ? size.width / 2 : size.height / 2;
-      let imageData = new ImageData(size.width, size.height);
-      const { data } = imageData;
-      const [red, green, blue, alpha] = [255, 0, 0, 200];
-      for (let x = -radius; x < radius; x++) {
-        for (let y = -radius; y < radius; y++) {
-          let distance = Math.sqrt(x * x + y * y);
-          if (distance > radius) {
-            // skip all (x,y) coordinates that are outside of the circle
-            continue;
-          }
-          // Figure out the starting index of this pixel in the image data array.
-          let adjustedX = x + radius; // convert x from [-50, 50] to [0, 100] (the coordinates of the image data array)
-          let adjustedY = y + radius; // convert y from [-50, 50] to [0, 100] (the coordinates of the image data array)
-          let index = (adjustedX + adjustedY * size.width) * 4;
-          data[index] = red;
-          data[index + 1] = green;
-          data[index + 2] = blue;
-          data[index + 3] = alpha;
-        }
+    const { width, height } = profile.size;
+    let imageData = new ImageData(width, height);
+    const { data } = imageData;
+    const colorCount = 100;
+    const { r, g, b, a } = generateLinearColorArrays(
+      colorCount,
+      profile.colorMap
+    );
+    for (let x = 0; x < width; x++) {
+      const xAng = (x / width) * 2 * Math.PI;
+      for (let y = 0; y < height; y++) {
+        const yAng = (y / height) * 2 * Math.PI;
+        const z = Math.floor(
+          ((Math.cos(xAng) ** 2 + Math.sin(yAng) ** 2) / 2) * colorCount
+        );
+        let index = (x + y * width) * 4;
+        data[index] = r[z];
+        data[index + 1] = g[z];
+        data[index + 2] = b[z];
+        data[index + 3] = a[z];
       }
-      setImageBuilding({ state: 'done', image: imageData });
-    }, 1500);
+    }
+    setImageBuilding({ state: 'done', image: imageData });
   }, [profile]);
 
   const onFullscreen = () => setShowFullscreen(true);
@@ -436,7 +243,13 @@ export const App = () => {
                   <ColorMapPicker
                     palette={profile.colorMap}
                     onPaletteChange={(palette) =>
-                      setProfile({ ...profile, colorMap: palette })
+                      setProfile({
+                        ...profile,
+                        colorMap: palette.map((pcp) => ({
+                          ...pcp,
+                          offset: parseFloat(pcp.offset as any),
+                        })),
+                      })
                     }
                   />
                 </Paper>
