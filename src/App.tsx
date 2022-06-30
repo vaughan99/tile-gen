@@ -27,6 +27,7 @@ import { defaultProfile, TileProfile } from './profile';
 import { Preview } from './components/Preview';
 import { TiledView } from './components/TiledView';
 import { ImageBuilding } from './imageBuilding';
+import { ColorMapPicker } from './components/ColorMapPicker';
 
 // import { ColorMapPicker } from './components/ColorMapPicker';
 // import { TileProfile, defaultProfile, PaletteControlPoint } from './profile';
@@ -431,7 +432,14 @@ export const App = () => {
                     flexDirection: 'column',
                     height: 240,
                   }}
-                ></Paper>
+                >
+                  <ColorMapPicker
+                    palette={profile.colorMap}
+                    onPaletteChange={(palette) =>
+                      setProfile({ ...profile, colorMap: palette })
+                    }
+                  />
+                </Paper>
               </Grid>
               <Grid item xs={12} md={4} lg={3}>
                 <Preview imageBuilding={imageBuilding} />
