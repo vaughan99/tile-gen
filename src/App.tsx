@@ -97,7 +97,7 @@ export const App = () => {
     const { width, height } = profile.size;
     let imageData = new ImageData(width, height);
     const { data } = imageData;
-    const colorCount = 100;
+    const colorCount = 200;
     const { r, g, b, a } = generateLinearColorArrays(
       colorCount,
       profile.colorMap

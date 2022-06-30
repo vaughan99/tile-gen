@@ -63,8 +63,6 @@ export const generateLinearColorArrays = (
   // Fill in missing PaletteControlPoint at beginning or end.
   const resolvedPalette = [...palette];
   const len = palette.length;
-  console.log(`palette[0]: ${JSON.stringify(palette[0])}`);
-  console.log(`palette[len-1]: ${JSON.stringify(palette[len - 1])}`);
   if (palette[0].offset !== 0) {
     resolvedPalette.unshift({ ...palette[0], offset: 0 });
   }
