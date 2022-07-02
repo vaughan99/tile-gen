@@ -1,4 +1,4 @@
-import { ControlPoint, PaletteControlPoint } from './profile';
+import { ControlPoint, TileProfile } from './profile';
 
 export const linear = (a: number, b: number, dist: number) =>
   a + (b - a) * dist;
@@ -22,11 +22,13 @@ export const generateLinearArray = (
   const controlPointQueue = [...controlPoints];
   let w1: ControlPoint = controlPointQueue.shift() as ControlPoint;
   let w2: ControlPoint = controlPointQueue.shift() as ControlPoint;
+  console.log(`w1,w2 = ${JSON.stringify([w1, w2])}`);
   for (let it = 0; it < length; it++) {
     const overallDist = it / length;
     if (overallDist > w2.offset) {
       w1 = w2;
       w2 = controlPointQueue.shift() as ControlPoint;
+      console.log(`w1,w2 = ${JSON.stringify([w1, w2])}`);
     }
     const relDist = (overallDist - w1.offset) / (w2.offset - w1.offset);
     values[it] = linear(w1.value, w2.value, relDist);
@@ -56,11 +58,9 @@ export const generateTrigonometricArray = (length: number): Array<number> =>
     { offset: 1, value: 2 * Math.PI },
   ]);
 
-export const generateLinearColorArrays = (
-  length: number,
-  palette: PaletteControlPoint[]
-) => {
+export const generateLinearColorArrays = (profile: TileProfile) => {
   // Fill in missing PaletteControlPoint at beginning or end.
+  const { palette, shades } = profile.colorMap;
   const resolvedPalette = [...palette];
   const len = palette.length;
   if (palette[0].offset !== 0) {
@@ -73,33 +73,33 @@ export const generateLinearColorArrays = (
   // Fill the arrays for each color.
   const rgbSplitter = /[(,\s)]+/;
   const r = generateLinearArray(
-    length,
+    shades,
     resolvedPalette.map((p) => ({
       offset: p.offset,
       value: parseInt(p.color.split(rgbSplitter)[1]),
     }))
   );
   const g = generateLinearArray(
-    length,
+    shades,
     resolvedPalette.map((p) => ({
       offset: p.offset,
       value: parseInt(p.color.split(rgbSplitter)[2]),
     }))
   );
   const b = generateLinearArray(
-    length,
+    shades,
     resolvedPalette.map((p) => ({
       offset: p.offset,
       value: parseInt(p.color.split(rgbSplitter)[3]),
     }))
   );
   const a = generateLinearArray(
-    length,
+    shades,
     resolvedPalette.map((p) => ({
       offset: p.offset,
       value: (p.opacity || 1) * 255,
     }))
   );
-
+  console.log(JSON.stringify(r));
   return { r, g, b, a };
 };

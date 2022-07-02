@@ -1,3 +1,7 @@
+export interface ColorMap {
+  palette: PaletteControlPoint[];
+  shades: number;
+}
 export interface PaletteControlPoint {
   offset: number; // 0 -> 1
   color: string; // e.g. 'rgb(0, 0, 0)'
@@ -40,7 +44,7 @@ export interface Size {
 export interface TileProfile {
   name: string;
   size: Size;
-  colorMap: PaletteControlPoint[];
+  colorMap: ColorMap;
   xAxis: AxisInterpolation;
   yAxis: AxisInterpolation;
   pattern: Pattern;
@@ -54,10 +58,13 @@ export const defaultProfile: TileProfile = {
     height: 500,
     width: 500,
   },
-  colorMap: [
-    { offset: 0, color: 'rgb(0,0,0,1)', opacity: 1 },
-    { offset: 1, color: 'rgb(255,255,255)', opacity: 1 },
-  ],
+  colorMap: {
+    shades: 100,
+    palette: [
+      { offset: 0, color: 'rgb(0,0,0,1)', opacity: 1 },
+      { offset: 1, color: 'rgb(255,255,255)', opacity: 1 },
+    ],
+  },
   xAxis: {
     type: 'linear',
     controlPoints: [

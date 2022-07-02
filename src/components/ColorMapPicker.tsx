@@ -1,12 +1,13 @@
+import { Slider, Stack } from '@mui/material';
 import React, { useState } from 'react';
 import { SketchPicker } from 'react-color';
 import { GradientPicker } from 'react-linear-gradient-picker';
 import 'react-linear-gradient-picker/dist/index.css';
-import { PaletteControlPoint } from '../profile';
+import { ColorMap, PaletteControlPoint } from '../profile';
 
 export interface ColorMapPickerProps {
-  palette: PaletteControlPoint[];
-  onPaletteChange: (newPalette: PaletteControlPoint[]) => void;
+  colorMap: ColorMap;
+  onColorMapChange: (newColorMap: ColorMap) => void;
 }
 
 type WrapperPropTypes = {
@@ -39,19 +40,52 @@ const WrappedColorPicker: React.FC<WrapperPropTypes> = ({
 export const ColorMapPicker: React.FC<ColorMapPickerProps> = (
   props: ColorMapPickerProps
 ): JSX.Element => {
+  const { colorMap, onColorMapChange } = props;
   const [open, setOpen] = useState(false);
+
+  const onShadesChange = (_evt: any, newShades: number | number[]) => {
+    onColorMapChange({
+      ...colorMap,
+      shades: newShades as number,
+    });
+  };
+
+  const onPaletteChange = (newPalette: PaletteControlPoint[]) => {
+    const revisedPalette = newPalette.map((pcp) => ({
+      ...pcp,
+      offset: pcp.offset < 0 ? 0 : parseFloat(pcp.offset as unknown as string),
+    }));
+    onColorMapChange({
+      ...colorMap,
+      palette: revisedPalette,
+    });
+  };
+
   return (
-    <GradientPicker
-      open={open}
-      setOpen={setOpen}
-      width={600}
-      paletteHeight={60}
-      palette={props.palette}
-      onPaletteChange={props.onPaletteChange}
-      maxStops={8}
-    >
-      <WrappedColorPicker color={'rgb(0,0,0)'} opacity={1} />
-    </GradientPicker>
+    <Stack>
+      <Slider
+        min={5}
+        max={200}
+        step={1}
+        defaultValue={colorMap.shades}
+        onChange={onShadesChange}
+        valueLabelDisplay="on"
+        sx={{
+          width: 600,
+        }}
+      />
+      <GradientPicker
+        open={open}
+        setOpen={setOpen}
+        width={600}
+        paletteHeight={60}
+        palette={props.colorMap.palette}
+        onPaletteChange={onPaletteChange}
+        maxStops={8}
+      >
+        <WrappedColorPicker color={'rgb(0,0,0)'} opacity={1} />
+      </GradientPicker>
+    </Stack>
   );
 };
 

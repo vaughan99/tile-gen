@@ -97,17 +97,14 @@ export const App = () => {
     const { width, height } = profile.size;
     let imageData = new ImageData(width, height);
     const { data } = imageData;
-    const colorCount = 200;
-    const { r, g, b, a } = generateLinearColorArrays(
-      colorCount,
-      profile.colorMap
-    );
+    const { r, g, b, a } = generateLinearColorArrays(profile);
+    const { shades } = profile.colorMap;
     for (let x = 0; x < width; x++) {
       const xAng = (x / width) * 2 * Math.PI;
       for (let y = 0; y < height; y++) {
         const yAng = (y / height) * 2 * Math.PI;
         const z = Math.floor(
-          ((Math.cos(xAng) ** 2 + Math.sin(yAng) ** 2) / 2) * colorCount
+          ((Math.cos(xAng) ** 2 + Math.sin(yAng) ** 2) / 2) * (shades - 1)
         );
         let index = (x + y * width) * 4;
         data[index] = r[z];
@@ -241,14 +238,11 @@ export const App = () => {
                   }}
                 >
                   <ColorMapPicker
-                    palette={profile.colorMap}
-                    onPaletteChange={(palette) =>
+                    colorMap={profile.colorMap}
+                    onColorMapChange={(colorMap) =>
                       setProfile({
                         ...profile,
-                        colorMap: palette.map((pcp) => ({
-                          ...pcp,
-                          offset: parseFloat(pcp.offset as any),
-                        })),
+                        colorMap,
                       })
                     }
                   />
