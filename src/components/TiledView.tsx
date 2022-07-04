@@ -5,12 +5,10 @@ import {
   CircularProgress,
   FormControlLabel,
   FormGroup,
-  IconButton,
   Switch,
   Toolbar,
   Typography,
 } from '@mui/material';
-import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import { Resizable } from 'react-resizable';
 import { PreviewProps } from './Preview';
 import { TileProfile } from '../profile';
@@ -18,25 +16,20 @@ import { TileProfile } from '../profile';
 export interface TiledViewProps extends PreviewProps {
   profile: TileProfile;
   setProfile: (profile: TileProfile) => void;
-  onFullscreenExit: () => void;
 }
 
 // TODO: Save settings in local storage.
+// TODO: Have checker background to bleed through alpha.
 export const TiledView = (props: TiledViewProps) => {
-  const { profile, setProfile, onFullscreenExit, imageBuilding } = props;
+  const { profile, setProfile, imageBuilding } = props;
   const [lockAspectRatio, setLockAspectRatio] = useState<boolean>(true);
   const [showFootprint, setShowFootprint] = useState<boolean>(false);
   const [tileWidth, setTileWidth] = useState<number>(profile.size.width);
   const [tileHeight, setTileHeight] = useState<number>(profile.size.height);
-  // const [redrawTimer, setRedrawTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [snap, setSnap] = useState<boolean>(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const onFootprintResize = (_evt: any, { size }: any) => {
-    // if (redrawTimer !== null) {
-    //   clearTimeout(redrawTimer);
-    //   setRedrawTimer(null);
-    // }
     if (snap) {
       size.width = Math.round(size.width / 5) * 5;
       size.height = Math.round(size.height / 5) * 5;
@@ -62,7 +55,6 @@ export const TiledView = (props: TiledViewProps) => {
         const { image } = imageBuilding;
         const effect = async () => {
           const bitmap = await createImageBitmap(image);
-          // ctx?.putImageData(imageBuilding.image, 0, 0);
           const pattern = ctx.createPattern(bitmap, 'repeat');
           if (pattern !== null) {
             ctx.fillStyle = pattern;
@@ -78,16 +70,8 @@ export const TiledView = (props: TiledViewProps) => {
     <div style={{ overflow: 'hidden' }}>
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={onFullscreenExit}
-            aria-label="close"
-          >
-            <CloseFullscreenIcon />
-          </IconButton>
           <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-            Preview and Sizer ({tileWidth} x {tileHeight})
+            Tiles ({tileWidth} x {tileHeight})
           </Typography>
 
           <FormGroup aria-label="position" row>

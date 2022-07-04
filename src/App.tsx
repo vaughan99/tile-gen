@@ -4,30 +4,20 @@ import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import LineAxisIcon from '@mui/icons-material/LineAxis';
-import FunctionsIcon from '@mui/icons-material/Functions';
-import StraightenIcon from '@mui/icons-material/Straighten';
-import ColorLensIcon from '@mui/icons-material/ColorLens';
-import BorderAllIcon from '@mui/icons-material/BorderAll';
-import { Dialog } from '@mui/material';
 import { defaultProfile, TileProfile } from './profile';
 import { Preview } from './components/Preview';
 import { TiledView } from './components/TiledView';
 import { ImageBuilding } from './imageBuilding';
 import { ColorMapPicker } from './components/ColorMapPicker';
+import { NavList, NavOptions } from './components/NavList';
 import { generateLinearColorArrays } from './interpolation';
 
 const drawerWidth: number = 240;
@@ -90,7 +80,7 @@ export const App = () => {
   const [open, setOpen] = React.useState(false);
   // const [undoHistory, setUndoHistory] = useState<Array<TileProfile>>([]);
   // const [redoHistory, setRedoHistory] = useState<Array<TileProfile>>([]);
-  const [showFullscreen, setShowFullscreen] = useState<boolean>(false);
+  const [navSelected, setNavSelected] = useState<NavOptions>('axis');
 
   // Calculate an image when the profile changes.
   useEffect(() => {
@@ -116,25 +106,17 @@ export const App = () => {
     setImageBuilding({ state: 'done', image: imageData });
   }, [profile]);
 
-  const onFullscreen = () => setShowFullscreen(true);
-  const onFullscreenExit = () => setShowFullscreen(false);
-
-  const toggleDrawer = () => {
-    setOpen(!open);
+  const toggleDrawer = () => setOpen(!open);
+  const onNavSelected = (nav: NavOptions) => {
+    setNavSelected(nav);
   };
 
   return (
     <ThemeProvider theme={mdTheme}>
-      <Dialog fullScreen open={showFullscreen} sx={{ overflow: 'hidden' }}>
-        <TiledView
-          onFullscreenExit={onFullscreenExit}
-          profile={profile}
-          setProfile={setProfile}
-          imageBuilding={imageBuilding}
-        />
-      </Dialog>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
+
+        {/* AppBar */}
         <AppBar position="absolute" open={open}>
           <Toolbar
             sx={{
@@ -164,6 +146,8 @@ export const App = () => {
             </Typography>
           </Toolbar>
         </AppBar>
+
+        {/* Nav Drawer */}
         <Drawer variant="permanent" open={open}>
           <Toolbar
             sx={{
@@ -178,40 +162,11 @@ export const App = () => {
             </IconButton>
           </Toolbar>
           <Divider />
-          <List component="nav">
-            <React.Fragment>
-              <ListItemButton onClick={onFullscreen}>
-                <ListItemIcon>
-                  <BorderAllIcon />
-                </ListItemIcon>
-                <ListItemText primary="Tiled View" />
-              </ListItemButton>
-              <ListItemButton>
-                <ListItemIcon>
-                  <LineAxisIcon />
-                </ListItemIcon>
-                <ListItemText primary="Axis" />
-              </ListItemButton>
-              <ListItemButton>
-                <ListItemIcon>
-                  <FunctionsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Pattern Functions" />
-              </ListItemButton>
-              <ListItemButton>
-                <ListItemIcon>
-                  <StraightenIcon />
-                </ListItemIcon>
-                <ListItemText primary="Normalization" />
-              </ListItemButton>
-              <ListItemButton>
-                <ListItemIcon>
-                  <ColorLensIcon />
-                </ListItemIcon>
-                <ListItemText primary="Color Map" />
-              </ListItemButton>
-            </React.Fragment>
-          </List>
+          <NavList
+            navSelected={navSelected}
+            onNavSelected={onNavSelected}
+            profile={profile}
+          />
         </Drawer>
         <Box
           component="main"
@@ -227,16 +182,27 @@ export const App = () => {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={1}>
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
+            {navSelected === 'tiled' ? (
+              <TiledView
+                profile={profile}
+                setProfile={setProfile}
+                imageBuilding={imageBuilding}
+              />
+            ) : (
+              <Stack>
+                <Preview imageBuilding={imageBuilding} />
+                {navSelected === 'axis' ? <Typography>Axis</Typography> : <></>}
+                {navSelected === 'pattern' ? (
+                  <Typography>Pattern</Typography>
+                ) : (
+                  <></>
+                )}
+                {navSelected === 'normalization' ? (
+                  <Typography>Normalization</Typography>
+                ) : (
+                  <></>
+                )}
+                {navSelected === 'colorMap' ? (
                   <ColorMapPicker
                     colorMap={profile.colorMap}
                     onColorMapChange={(colorMap) =>
@@ -246,17 +212,11 @@ export const App = () => {
                       })
                     }
                   />
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4} lg={3}>
-                <Preview imageBuilding={imageBuilding} />
-              </Grid>
-              <Grid item xs={12}>
-                <Paper
-                  sx={{ p: 2, display: 'flex', flexDirection: 'column' }}
-                ></Paper>
-              </Grid>
-            </Grid>
+                ) : (
+                  <></>
+                )}
+              </Stack>
+            )}
           </Container>
         </Box>
       </Box>

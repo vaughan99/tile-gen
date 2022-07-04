@@ -6,9 +6,10 @@ export interface PreviewProps {
   imageBuilding: ImageBuilding;
 }
 
-const canvasWidth = 200;
-const canvasHeight = 200;
+const canvasWidth = 400;
+const canvasHeight = 300;
 
+// TODO: Have checkered background to bleed through alpha.
 export const Preview = (props: PreviewProps) => {
   const { imageBuilding } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);

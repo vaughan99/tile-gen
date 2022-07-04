@@ -22,13 +22,11 @@ export const generateLinearArray = (
   const controlPointQueue = [...controlPoints];
   let w1: ControlPoint = controlPointQueue.shift() as ControlPoint;
   let w2: ControlPoint = controlPointQueue.shift() as ControlPoint;
-  console.log(`w1,w2 = ${JSON.stringify([w1, w2])}`);
   for (let it = 0; it < length; it++) {
     const overallDist = it / length;
     if (overallDist > w2.offset) {
       w1 = w2;
       w2 = controlPointQueue.shift() as ControlPoint;
-      console.log(`w1,w2 = ${JSON.stringify([w1, w2])}`);
     }
     const relDist = (overallDist - w1.offset) / (w2.offset - w1.offset);
     values[it] = linear(w1.value, w2.value, relDist);
@@ -100,6 +98,5 @@ export const generateLinearColorArrays = (profile: TileProfile) => {
       value: (p.opacity || 1) * 255,
     }))
   );
-  console.log(JSON.stringify(r));
   return { r, g, b, a };
 };
