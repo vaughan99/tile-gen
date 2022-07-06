@@ -1,17 +1,27 @@
-import { Box, CircularProgress } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Slider,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { useEffect, useRef } from 'react';
 import { ImageBuilding } from '../imageBuilding';
+import { TileProfile } from '../profile';
+import { options, setOptions } from '../options';
 
 export interface PreviewProps {
+  profile: TileProfile;
   imageBuilding: ImageBuilding;
 }
 
-const canvasWidth = 400;
+const canvasWidth = 600;
 const canvasHeight = 300;
 
 // TODO: Have checkered background to bleed through alpha.
 export const Preview = (props: PreviewProps) => {
-  const { imageBuilding } = props;
+  const { imageBuilding, profile } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -44,25 +54,59 @@ export const Preview = (props: PreviewProps) => {
   }, [imageBuilding, canvasRef]);
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      sx={{
-        border: '1px dashed lightgrey',
-        height: canvasHeight,
-        width: canvasWidth,
-        alignItems: 'center',
-      }}
-    >
-      {imageBuilding.image ? (
-        <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />
-      ) : (
-        <CircularProgress
-          aria-busy
-          sx={{ height: canvasHeight, width: canvasWidth }}
-        />
-      )}
-    </Box>
+    <Container>
+      <Stack direction="row">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          sx={{
+            border: '1px dashed lightgrey',
+            height: canvasHeight,
+            width: canvasWidth,
+            alignItems: 'center',
+          }}
+        >
+          {imageBuilding.image ? (
+            <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />
+          ) : (
+            <CircularProgress
+              aria-busy
+              sx={{ height: canvasHeight, width: canvasWidth }}
+            />
+          )}
+        </Box>
+        <Stack direction="column">
+          <Stack direction="row">
+            <Typography>Width: </Typography>
+            <Slider
+              min={20}
+              max={500}
+              step={1}
+              value={profile.size.width}
+              onChange={() => {}}
+              valueLabelDisplay="on"
+              sx={{
+                width: 200,
+              }}
+            />
+          </Stack>
+          <Stack direction="row">
+            <Typography>Height: </Typography>
+            <Slider
+              min={20}
+              max={500}
+              step={1}
+              value={profile.size.height}
+              onChange={() => {}}
+              valueLabelDisplay="on"
+              sx={{
+                width: 200,
+              }}
+            />
+          </Stack>
+        </Stack>
+      </Stack>
+    </Container>
   );
 };

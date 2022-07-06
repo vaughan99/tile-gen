@@ -177,11 +177,14 @@ export const App = () => {
                 : theme.palette.grey[900],
             flexGrow: 1,
             height: '100vh',
-            overflow: 'auto',
+            overflow: 'hidden',
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Container
+            maxWidth="lg"
+            sx={{ mt: 4, mb: 4, ml: 0, mr: 0, pl: 0, pr: 0 }}
+          >
             {navSelected === 'tiled' ? (
               <TiledView
                 profile={profile}
@@ -190,7 +193,7 @@ export const App = () => {
               />
             ) : (
               <Stack>
-                <Preview imageBuilding={imageBuilding} />
+                <Preview profile={profile} imageBuilding={imageBuilding} />
                 {navSelected === 'axis' ? <Typography>Axis</Typography> : <></>}
                 {navSelected === 'pattern' ? (
                   <Typography>Pattern</Typography>
