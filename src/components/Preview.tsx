@@ -10,6 +10,7 @@ import { useEffect, useRef } from 'react';
 import { ImageBuilding } from '../imageBuilding';
 import { TileProfile } from '../profile';
 import { options, setOptions } from '../options';
+import { backgroundCheckboardCanvas } from '../checkboard';
 
 export interface PreviewProps {
   profile: TileProfile;
@@ -30,6 +31,16 @@ export const Preview = (props: PreviewProps) => {
       const ctx = canvas.getContext('2d');
       if (ctx !== null) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (backgroundCheckboardCanvas !== null) {
+          const pattern = ctx.createPattern(
+            backgroundCheckboardCanvas,
+            'repeat'
+          );
+          if (pattern !== null) {
+            ctx.fillStyle = pattern;
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+          }
+        }
         const { image } = imageBuilding;
         const effect = async () => {
           const bitmap = await createImageBitmap(image);
@@ -68,7 +79,16 @@ export const Preview = (props: PreviewProps) => {
           }}
         >
           {imageBuilding.image ? (
-            <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />
+            <canvas
+              ref={canvasRef}
+              width={canvasWidth}
+              height={canvasHeight}
+              style={{
+                position: 'relative',
+                backgroundColor: 'rgba(0,0,0,0)',
+                zIndex: 2000,
+              }}
+            />
           ) : (
             <CircularProgress
               aria-busy

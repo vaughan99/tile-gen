@@ -5,15 +5,13 @@ import {
   FormControlLabel,
   FormGroup,
   Grid,
-  Paper,
-  Stack,
   Switch,
   Typography,
 } from '@mui/material';
 import { Resizable } from 'react-resizable';
 import { PreviewProps } from './Preview';
 import { TileProfile } from '../profile';
-import { Container } from '@mui/system';
+import { backgroundCheckboardCanvas } from '../checkboard';
 
 export interface TiledViewProps extends PreviewProps {
   profile: TileProfile;
@@ -21,7 +19,6 @@ export interface TiledViewProps extends PreviewProps {
 }
 
 // TODO: Save settings in local storage.
-// TODO: Have checker background to bleed through alpha.
 export const TiledView = (props: TiledViewProps) => {
   const { profile, setProfile, imageBuilding } = props;
   const [lockAspectRatio, setLockAspectRatio] = useState<boolean>(true);
@@ -54,6 +51,16 @@ export const TiledView = (props: TiledViewProps) => {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx !== null) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (backgroundCheckboardCanvas !== null) {
+          const pattern = ctx.createPattern(
+            backgroundCheckboardCanvas,
+            'repeat'
+          );
+          if (pattern !== null) {
+            ctx.fillStyle = pattern;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+        }
         const { image } = imageBuilding;
         const effect = async () => {
           const bitmap = await createImageBitmap(image);
@@ -125,7 +132,6 @@ export const TiledView = (props: TiledViewProps) => {
             <>
               <canvas
                 style={{
-                  backgroundColor: '#f0f0f0',
                   position: 'relative',
                   zIndex: 2000,
                 }}
