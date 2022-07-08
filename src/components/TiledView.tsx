@@ -1,21 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   Box,
+  Card,
+  CardContent,
+  CardHeader,
   CircularProgress,
   FormControlLabel,
   FormGroup,
-  Grid,
+  Stack,
   Switch,
   Typography,
 } from '@mui/material';
+import BorderAllIcon from '@mui/icons-material/BorderAll';
 import { Resizable } from 'react-resizable';
 import { PreviewProps } from './Preview';
-import { TileProfile } from '../profile';
+import { TileProfile, Size } from '../profile';
 import { backgroundCheckboardCanvas } from '../checkboard';
+import { ImageBuilding } from '../imageBuilding';
 
 export interface TiledViewProps extends PreviewProps {
   profile: TileProfile;
   setProfile: (profile: TileProfile) => void;
+  imageBuilding: ImageBuilding;
 }
 
 // TODO: Save settings in local storage.
@@ -23,8 +29,7 @@ export const TiledView = (props: TiledViewProps) => {
   const { profile, setProfile, imageBuilding } = props;
   const [lockAspectRatio, setLockAspectRatio] = useState<boolean>(true);
   const [showFootprint, setShowFootprint] = useState<boolean>(false);
-  const [tileWidth, setTileWidth] = useState<number>(profile.size.width);
-  const [tileHeight, setTileHeight] = useState<number>(profile.size.height);
+  const [size, setSize] = useState<Size>({ ...profile.size });
   const [snap, setSnap] = useState<boolean>(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -36,8 +41,7 @@ export const TiledView = (props: TiledViewProps) => {
       size.width = Math.round(size.width);
       size.height = Math.round(size.height);
     }
-    setTileWidth(size.width);
-    setTileHeight(size.height);
+    setSize(size);
   };
 
   const onFootprintResizeStop = (evt: any, { size }: any) => {
@@ -76,57 +80,60 @@ export const TiledView = (props: TiledViewProps) => {
   }, [imageBuilding, canvasRef]);
 
   return (
-    <Grid container spacing={0.5}>
-      <Grid item xs={4} md={4}>
-        <Typography variant="h5" component="div" alignSelf="start">
-          Individual Size: {tileWidth} x {tileHeight}
-        </Typography>
-      </Grid>
-      <Grid item xs={8} md={8} justifyContent="flex-end">
-        <FormGroup
-          aria-label="position"
-          row
-          sx={{ justifyContent: 'flex-end' }}
-        >
-          <FormControlLabel
-            control={
-              <Switch
-                onChange={(_evt, checked) => setShowFootprint(checked)}
-                color="secondary"
+    <Card variant="outlined">
+      <CardHeader
+        title={
+          <Stack direction="row" alignContent="center" spacing={1}>
+            <BorderAllIcon />
+            <Typography>
+              Expanded ({size.width} x {size.height})
+            </Typography>
+            <FormGroup
+              aria-label="position"
+              row
+              sx={{ justifyContent: 'flex-end' }}
+            >
+              <FormControlLabel
+                control={
+                  <Switch
+                    onChange={(_evt, checked) => setShowFootprint(checked)}
+                    color="secondary"
+                  />
+                }
+                disabled={!imageBuilding.image}
+                checked={showFootprint}
+                label="Show Footprint"
+                labelPlacement="end"
               />
-            }
-            disabled={!imageBuilding.image}
-            checked={showFootprint}
-            label="Show Footprint"
-            labelPlacement="end"
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                onChange={(_evt, checked) => setLockAspectRatio(checked)}
-                color="secondary"
+              <FormControlLabel
+                control={
+                  <Switch
+                    onChange={(_evt, checked) => setLockAspectRatio(checked)}
+                    color="secondary"
+                  />
+                }
+                disabled={!imageBuilding.image || !showFootprint}
+                checked={lockAspectRatio}
+                label="Lock Aspect Ratio"
+                labelPlacement="end"
               />
-            }
-            disabled={!imageBuilding.image || !showFootprint}
-            checked={lockAspectRatio}
-            label="Lock Aspect Ratio"
-            labelPlacement="end"
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                onChange={(_evt, checked) => setSnap(checked)}
-                color="secondary"
+              <FormControlLabel
+                control={
+                  <Switch
+                    onChange={(_evt, checked) => setSnap(checked)}
+                    color="secondary"
+                  />
+                }
+                disabled={!imageBuilding.image || !showFootprint}
+                checked={snap}
+                label="Snap to 5px"
+                labelPlacement="end"
               />
-            }
-            disabled={!imageBuilding.image || !showFootprint}
-            checked={snap}
-            label="Snap to 5px"
-            labelPlacement="end"
-          />
-        </FormGroup>
-      </Grid>
-      <Grid item xs={12} md={12}>
+            </FormGroup>
+          </Stack>
+        }
+      />
+      <CardContent>
         <Box height="100%" display="flex">
           {imageBuilding.image ? (
             <>
@@ -140,8 +147,8 @@ export const TiledView = (props: TiledViewProps) => {
                 height={2500}
               />
               <Resizable
-                height={tileHeight}
-                width={tileWidth}
+                height={size.height}
+                width={size.width}
                 lockAspectRatio={lockAspectRatio}
                 handleSize={[10, 10]}
                 minConstraints={[20, 20]}
@@ -152,8 +159,8 @@ export const TiledView = (props: TiledViewProps) => {
                 <div
                   hidden={!showFootprint}
                   style={{
-                    height: tileHeight,
-                    width: tileWidth,
+                    height: size.height,
+                    width: size.width,
                     backgroundColor: 'rgba(0, 0, 0, 0.2)',
                     zIndex: 2001,
                     position: 'absolute',
@@ -165,7 +172,7 @@ export const TiledView = (props: TiledViewProps) => {
             <CircularProgress aria-busy size={100} thickness={6} />
           )}
         </Box>
-      </Grid>
-    </Grid>
+      </CardContent>
+    </Card>
   );
 };

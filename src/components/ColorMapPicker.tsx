@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
-import { SketchPicker } from 'react-color';
+import { ChromePicker, SketchPicker } from 'react-color';
 import { GradientPicker } from 'react-linear-gradient-picker';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import 'react-linear-gradient-picker/dist/index.css';
@@ -34,7 +34,7 @@ const WrappedColorPicker: React.FC<WrapperPropTypes> = ({
   ...rest
 }) => {
   return (
-    <SketchPicker
+    <ChromePicker
       {...rest}
       color={rgbToRgba(rest.color, rest.opacity)}
       onChange={(c) => {

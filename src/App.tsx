@@ -19,6 +19,7 @@ import { ImageBuilding } from './imageBuilding';
 import { ColorMapPicker } from './components/ColorMapPicker';
 import { NavList, NavOptions } from './components/NavList';
 import { generateLinearColorArrays } from './interpolation';
+import { PatternEditor } from './components/PatternEditor';
 
 const drawerWidth: number = 240;
 
@@ -193,13 +194,13 @@ export const App = () => {
               />
             ) : (
               <Stack spacing={2}>
-                <Preview profile={profile} imageBuilding={imageBuilding} />
+                <Preview
+                  profile={profile}
+                  setProfile={setProfile}
+                  imageBuilding={imageBuilding}
+                />
                 {navSelected === 'axis' ? <Typography>Axis</Typography> : ''}
-                {navSelected === 'pattern' ? (
-                  <Typography>Pattern</Typography>
-                ) : (
-                  <></>
-                )}
+                {navSelected === 'pattern' ? <PatternEditor /> : <></>}
                 {navSelected === 'normalization' ? (
                   <Typography>Normalization</Typography>
                 ) : (

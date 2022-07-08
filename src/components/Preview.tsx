@@ -9,24 +9,26 @@ import {
   Typography,
 } from '@mui/material';
 import ImageIcon from '@mui/icons-material/Image';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ImageBuilding } from '../imageBuilding';
-import { TileProfile } from '../profile';
+import { Size, TileProfile } from '../profile';
 import { options, setOptions } from '../options';
 import { backgroundCheckboardCanvas } from '../checkboard';
 
 export interface PreviewProps {
   profile: TileProfile;
+  setProfile: (profile: TileProfile) => void;
   imageBuilding: ImageBuilding;
 }
 
-const canvasWidth = 600;
-const canvasHeight = 300;
+const canvasWidth = 250;
+const canvasHeight = 250;
 
 // TODO: Have checkered background to bleed through alpha.
 export const Preview = (props: PreviewProps) => {
-  const { imageBuilding, profile } = props;
+  const { imageBuilding, profile, setProfile } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [size, setSize] = useState<Size>(profile.size);
 
   useEffect(() => {
     if (canvasRef.current !== null && imageBuilding.image !== undefined) {
@@ -67,77 +69,80 @@ export const Preview = (props: PreviewProps) => {
     }
   }, [imageBuilding, canvasRef]);
 
+  const onSizeCommitted = () => {
+    setProfile({ ...profile, size });
+  };
+
   return (
     <Card variant="outlined">
       <CardHeader
         title={
           <Stack direction="row" alignContent="center" spacing={1}>
             <ImageIcon />
-            <Typography>Tile Preview</Typography>
+            <Typography>
+              Preview ({size.width} x {size.height})
+            </Typography>
           </Stack>
         }
       />
       <CardContent>
-        <Stack direction="row">
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            sx={{
-              border: '1px dashed lightgrey',
-              height: canvasHeight,
-              width: canvasWidth,
-              alignItems: 'center',
-            }}
-          >
-            {imageBuilding.image ? (
-              <canvas
-                ref={canvasRef}
-                width={canvasWidth}
-                height={canvasHeight}
-                style={{
-                  position: 'relative',
-                  backgroundColor: 'rgba(0,0,0,0)',
-                  zIndex: 2000,
-                }}
-              />
-            ) : (
-              <CircularProgress
-                aria-busy
-                sx={{ height: canvasHeight, width: canvasWidth }}
-              />
-            )}
-          </Box>
-          <Stack direction="column">
-            <Stack direction="row">
-              <Typography>Width: </Typography>
-              <Slider
-                min={20}
-                max={500}
-                step={1}
-                value={profile.size.width}
-                onChange={() => {}}
-                valueLabelDisplay="on"
-                sx={{
-                  width: 200,
-                }}
-              />
-            </Stack>
-            <Stack direction="row">
-              <Typography>Height: </Typography>
-              <Slider
-                min={20}
-                max={500}
-                step={1}
-                value={profile.size.height}
-                onChange={() => {}}
-                valueLabelDisplay="on"
-                sx={{
-                  width: 200,
-                }}
-              />
-            </Stack>
+        <Stack>
+          <Stack direction="row">
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                border: '1px dashed lightgrey',
+                height: canvasHeight,
+                width: canvasWidth,
+                alignItems: 'center',
+              }}
+            >
+              {imageBuilding.image ? (
+                <canvas
+                  ref={canvasRef}
+                  width={canvasWidth}
+                  height={canvasHeight}
+                  style={{
+                    position: 'relative',
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    zIndex: 2000,
+                  }}
+                />
+              ) : (
+                <CircularProgress
+                  aria-busy
+                  sx={{ height: canvasHeight, width: canvasWidth }}
+                />
+              )}
+            </Box>
+            <Slider
+              orientation="vertical"
+              min={20}
+              max={500}
+              step={1}
+              value={size.height}
+              onChange={(_evt, val) =>
+                setSize({ ...size, height: val as number })
+              }
+              onChangeCommitted={onSizeCommitted}
+              sx={{
+                height: canvasHeight,
+              }}
+            />
           </Stack>
+          <Slider
+            min={20}
+            max={500}
+            step={1}
+            value={size.width}
+            onChange={(_evt, val) => setSize({ ...size, width: val as number })}
+            onChangeCommitted={onSizeCommitted}
+            sx={{
+              width: canvasWidth,
+            }}
+          />
         </Stack>
       </CardContent>
     </Card>

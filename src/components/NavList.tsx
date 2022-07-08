@@ -9,6 +9,7 @@ import StraightenIcon from '@mui/icons-material/Straighten';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import BorderAllIcon from '@mui/icons-material/BorderAll';
 import { TileProfile } from '../profile';
+import { Divider } from '@mui/material';
 
 export type NavOptions =
   | 'tiled'
@@ -36,9 +37,9 @@ export const NavList = (props: NavListProps) => {
           <ListItemIcon>
             <BorderAllIcon />
           </ListItemIcon>
-          <ListItemText primary="View Tiled" />
+          <ListItemText primary="Expanded" />
         </ListItemButton>
-
+        <Divider />
         <ListItemButton
           selected={navSelected === 'axis'}
           onClick={() => onNavSelected('axis')}
@@ -56,7 +57,7 @@ export const NavList = (props: NavListProps) => {
           <ListItemIcon>
             <FunctionsIcon />
           </ListItemIcon>
-          <ListItemText primary="Pattern Functions" />
+          <ListItemText primary="Pattern Editor" />
         </ListItemButton>
 
         <ListItemButton
