@@ -192,9 +192,9 @@ export const App = () => {
                 imageBuilding={imageBuilding}
               />
             ) : (
-              <Stack>
+              <Stack spacing={2}>
                 <Preview profile={profile} imageBuilding={imageBuilding} />
-                {navSelected === 'axis' ? <Typography>Axis</Typography> : <></>}
+                {navSelected === 'axis' ? <Typography>Axis</Typography> : ''}
                 {navSelected === 'pattern' ? (
                   <Typography>Pattern</Typography>
                 ) : (

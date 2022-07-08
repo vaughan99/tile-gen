@@ -1,11 +1,14 @@
 import {
   Box,
+  Card,
+  CardContent,
+  CardHeader,
   CircularProgress,
-  Container,
   Slider,
   Stack,
   Typography,
 } from '@mui/material';
+import ImageIcon from '@mui/icons-material/Image';
 import { useEffect, useRef } from 'react';
 import { ImageBuilding } from '../imageBuilding';
 import { TileProfile } from '../profile';
@@ -65,68 +68,78 @@ export const Preview = (props: PreviewProps) => {
   }, [imageBuilding, canvasRef]);
 
   return (
-    <Container>
-      <Stack direction="row">
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          sx={{
-            border: '1px dashed lightgrey',
-            height: canvasHeight,
-            width: canvasWidth,
-            alignItems: 'center',
-          }}
-        >
-          {imageBuilding.image ? (
-            <canvas
-              ref={canvasRef}
-              width={canvasWidth}
-              height={canvasHeight}
-              style={{
-                position: 'relative',
-                backgroundColor: 'rgba(0,0,0,0)',
-                zIndex: 2000,
-              }}
-            />
-          ) : (
-            <CircularProgress
-              aria-busy
-              sx={{ height: canvasHeight, width: canvasWidth }}
-            />
-          )}
-        </Box>
-        <Stack direction="column">
-          <Stack direction="row">
-            <Typography>Width: </Typography>
-            <Slider
-              min={20}
-              max={500}
-              step={1}
-              value={profile.size.width}
-              onChange={() => {}}
-              valueLabelDisplay="on"
-              sx={{
-                width: 200,
-              }}
-            />
+    <Card variant="outlined">
+      <CardHeader
+        title={
+          <Stack direction="row" alignContent="center" spacing={1}>
+            <ImageIcon />
+            <Typography>Tile Preview</Typography>
           </Stack>
-          <Stack direction="row">
-            <Typography>Height: </Typography>
-            <Slider
-              min={20}
-              max={500}
-              step={1}
-              value={profile.size.height}
-              onChange={() => {}}
-              valueLabelDisplay="on"
-              sx={{
-                width: 200,
-              }}
-            />
+        }
+      />
+      <CardContent>
+        <Stack direction="row">
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            sx={{
+              border: '1px dashed lightgrey',
+              height: canvasHeight,
+              width: canvasWidth,
+              alignItems: 'center',
+            }}
+          >
+            {imageBuilding.image ? (
+              <canvas
+                ref={canvasRef}
+                width={canvasWidth}
+                height={canvasHeight}
+                style={{
+                  position: 'relative',
+                  backgroundColor: 'rgba(0,0,0,0)',
+                  zIndex: 2000,
+                }}
+              />
+            ) : (
+              <CircularProgress
+                aria-busy
+                sx={{ height: canvasHeight, width: canvasWidth }}
+              />
+            )}
+          </Box>
+          <Stack direction="column">
+            <Stack direction="row">
+              <Typography>Width: </Typography>
+              <Slider
+                min={20}
+                max={500}
+                step={1}
+                value={profile.size.width}
+                onChange={() => {}}
+                valueLabelDisplay="on"
+                sx={{
+                  width: 200,
+                }}
+              />
+            </Stack>
+            <Stack direction="row">
+              <Typography>Height: </Typography>
+              <Slider
+                min={20}
+                max={500}
+                step={1}
+                value={profile.size.height}
+                onChange={() => {}}
+                valueLabelDisplay="on"
+                sx={{
+                  width: 200,
+                }}
+              />
+            </Stack>
           </Stack>
         </Stack>
-      </Stack>
-    </Container>
+      </CardContent>
+    </Card>
   );
 };

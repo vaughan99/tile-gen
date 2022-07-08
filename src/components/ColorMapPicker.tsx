@@ -1,7 +1,15 @@
-import { Slider, Stack } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Slider,
+  Stack,
+  Typography,
+} from '@mui/material';
 import React, { useState } from 'react';
 import { SketchPicker } from 'react-color';
 import { GradientPicker } from 'react-linear-gradient-picker';
+import ColorLensIcon from '@mui/icons-material/ColorLens';
 import 'react-linear-gradient-picker/dist/index.css';
 import { ColorMap, PaletteControlPoint } from '../profile';
 
@@ -62,30 +70,46 @@ export const ColorMapPicker: React.FC<ColorMapPickerProps> = (
   };
 
   return (
-    <Stack>
-      <Slider
-        min={5}
-        max={200}
-        step={1}
-        value={colorMap.shades}
-        onChange={onShadesChange}
-        valueLabelDisplay="on"
-        sx={{
-          width: 600,
-        }}
+    <Card variant="outlined">
+      <CardHeader
+        sx={{ alignItems: 'center' }}
+        title={
+          <Stack direction="row" alignContent="center" spacing={1}>
+            <ColorLensIcon />
+            <Typography>Color Map</Typography>
+          </Stack>
+        }
       />
-      <GradientPicker
-        open={open}
-        setOpen={setOpen}
-        width={600}
-        paletteHeight={60}
-        palette={props.colorMap.palette}
-        onPaletteChange={onPaletteChange}
-        maxStops={8}
-      >
-        <WrappedColorPicker color={'rgb(0,0,0)'} opacity={1} />
-      </GradientPicker>
-    </Stack>
+      <CardContent>
+        <Stack spacing={2}>
+          <Stack direction="row" spacing={2}>
+            <Typography>Shades:</Typography>
+            <Typography>{colorMap.shades}</Typography>
+            <Slider
+              min={5}
+              max={200}
+              step={1}
+              value={colorMap.shades}
+              onChange={onShadesChange}
+              sx={{
+                width: 600,
+              }}
+            />
+          </Stack>
+          <GradientPicker
+            open={open}
+            setOpen={setOpen}
+            width={600}
+            paletteHeight={60}
+            palette={props.colorMap.palette}
+            onPaletteChange={onPaletteChange}
+            maxStops={8}
+          >
+            <WrappedColorPicker color={'rgb(0,0,0)'} opacity={1} />
+          </GradientPicker>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };
 
