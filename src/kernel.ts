@@ -1,5 +1,5 @@
-import { GPU } from 'gpu.js';
 import { TileProfile } from './profile';
+const { GPU } = require('./lib/gpu');
 
 // PATTERN CREATION
 // Create a pattern "kernel" for the GPU that will
