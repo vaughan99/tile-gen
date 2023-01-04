@@ -21,8 +21,8 @@ export interface PreviewProps {
   imageBuilding: ImageBuilding;
 }
 
-const canvasWidth = 250;
-const canvasHeight = 250;
+const canvasWidth = 500;
+const canvasHeight = 500;
 
 // TODO: Have checkered background to bleed through alpha.
 export const Preview = (props: PreviewProps) => {
@@ -49,9 +49,10 @@ export const Preview = (props: PreviewProps) => {
         const { image } = imageBuilding;
         const effect = async () => {
           const bitmap = await createImageBitmap(image);
-          const scaleX = bitmap.width / canvasWidth;
-          const scaleY = bitmap.height / canvasHeight;
-          const scale = scaleX >= scaleY ? scaleX : scaleY;
+          // const scaleX = bitmap.width / canvasWidth;
+          // const scaleY = bitmap.height / canvasHeight;
+          // const scale = scaleX >= scaleY ? scaleX : scaleY;
+          const scale = 1;
           ctx.drawImage(
             bitmap,
             0,
@@ -59,7 +60,7 @@ export const Preview = (props: PreviewProps) => {
             bitmap.width,
             bitmap.height,
             0,
-            0,
+            canvasHeight - bitmap.height / scale,
             Math.floor(bitmap.width / scale),
             Math.floor(bitmap.height / scale)
           );
@@ -88,6 +89,20 @@ export const Preview = (props: PreviewProps) => {
       <CardContent>
         <Stack>
           <Stack direction="row">
+            <Slider
+              orientation="vertical"
+              min={20}
+              max={500}
+              step={1}
+              value={size.height}
+              onChange={(_evt, val) =>
+                setSize({ ...size, height: val as number })
+              }
+              onChangeCommitted={onSizeCommitted}
+              sx={{
+                height: canvasHeight,
+              }}
+            />
             <Box
               display="flex"
               justifyContent="center"
@@ -117,32 +132,23 @@ export const Preview = (props: PreviewProps) => {
                 />
               )}
             </Box>
+          </Stack>
+          <Stack direction="row">
+            <Box height={20} width={30} />
             <Slider
-              orientation="vertical"
               min={20}
               max={500}
               step={1}
-              value={size.height}
+              value={size.width}
               onChange={(_evt, val) =>
-                setSize({ ...size, height: val as number })
+                setSize({ ...size, width: val as number })
               }
               onChangeCommitted={onSizeCommitted}
               sx={{
-                height: canvasHeight,
+                width: canvasWidth,
               }}
             />
           </Stack>
-          <Slider
-            min={20}
-            max={500}
-            step={1}
-            value={size.width}
-            onChange={(_evt, val) => setSize({ ...size, width: val as number })}
-            onChangeCommitted={onSizeCommitted}
-            sx={{
-              width: canvasWidth,
-            }}
-          />
         </Stack>
       </CardContent>
     </Card>

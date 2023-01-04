@@ -20,6 +20,7 @@ import { ColorMapPicker } from './components/ColorMapPicker';
 import { NavList, NavOptions } from './components/NavList';
 import { generateLinearColorArrays } from './interpolation';
 import { PatternEditor } from './components/PatternEditor';
+import { Grid } from '@mui/material';
 
 const drawerWidth: number = 240;
 
@@ -182,46 +183,49 @@ export const App = () => {
           }}
         >
           <Toolbar />
-          <Container
-            maxWidth="lg"
-            sx={{ mt: 4, mb: 4, ml: 0, mr: 0, pl: 0, pr: 0 }}
-          >
+          <Grid container>
             {navSelected === 'tiled' ? (
-              <TiledView
-                profile={profile}
-                setProfile={setProfile}
-                imageBuilding={imageBuilding}
-              />
-            ) : (
-              <Stack spacing={2}>
-                <Preview
+              <Grid item xs={12}>
+                <TiledView
                   profile={profile}
                   setProfile={setProfile}
                   imageBuilding={imageBuilding}
                 />
-                {navSelected === 'axis' ? <Typography>Axis</Typography> : ''}
-                {navSelected === 'pattern' ? <PatternEditor /> : <></>}
-                {navSelected === 'normalization' ? (
-                  <Typography>Normalization</Typography>
-                ) : (
-                  <></>
-                )}
-                {navSelected === 'colorMap' ? (
-                  <ColorMapPicker
-                    colorMap={profile.colorMap}
-                    onColorMapChange={(colorMap) =>
-                      setProfile({
-                        ...profile,
-                        colorMap,
-                      })
-                    }
+              </Grid>
+            ) : (
+              <>
+                <Grid item xs={6}>
+                  {navSelected === 'axis' ? <Typography>Axis</Typography> : ''}
+                  {navSelected === 'pattern' ? <PatternEditor /> : <></>}
+                  {navSelected === 'normalization' ? (
+                    <Typography>Normalization</Typography>
+                  ) : (
+                    <></>
+                  )}
+                  {navSelected === 'colorMap' ? (
+                    <ColorMapPicker
+                      colorMap={profile.colorMap}
+                      onColorMapChange={(colorMap) =>
+                        setProfile({
+                          ...profile,
+                          colorMap,
+                        })
+                      }
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </Grid>
+                <Grid item xs={6}>
+                  <Preview
+                    profile={profile}
+                    setProfile={setProfile}
+                    imageBuilding={imageBuilding}
                   />
-                ) : (
-                  <></>
-                )}
-              </Stack>
+                </Grid>
+              </>
             )}
-          </Container>
+          </Grid>
         </Box>
       </Box>
     </ThemeProvider>

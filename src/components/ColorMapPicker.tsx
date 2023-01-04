@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
-import { ChromePicker, SketchPicker } from 'react-color';
+import { ChromePicker } from 'react-color';
 import { GradientPicker } from 'react-linear-gradient-picker';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import 'react-linear-gradient-picker/dist/index.css';
@@ -92,14 +92,14 @@ export const ColorMapPicker: React.FC<ColorMapPickerProps> = (
               value={colorMap.shades}
               onChange={onShadesChange}
               sx={{
-                width: 600,
+                width: 400,
               }}
             />
           </Stack>
           <GradientPicker
             open={open}
             setOpen={setOpen}
-            width={600}
+            width={400}
             paletteHeight={60}
             palette={props.colorMap.palette}
             onPaletteChange={onPaletteChange}
